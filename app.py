@@ -182,7 +182,7 @@ def download_playlist(url, output_dir, playlist_info=None):
                 playlist_info = ydl.extract_info(url, download=False)
         
         if 'entries' not in playlist_info:
-            st.error("Aucune entrée trouvée dans la playlist. Assurez-vous que l'URL de la playlist est valide.")
+            st.error("Aucune entrée trouvée dans la playlist. Assure-toi que l'URL de la playlist est valide et publique.")
             return results
         
         entries = [e for e in playlist_info['entries'] if e is not None]
@@ -277,11 +277,11 @@ with st.form(key="playlist_form", clear_on_submit=False):
 
 if submit:
     if not playlist_url:
-        st.warning("Veuillez entrer une URL de playlist YouTube")
+        st.warning("Entre une URL de playlist YouTube")
     else:
         # Validate URL
         if 'youtube.com' not in playlist_url and 'youtu.be' not in playlist_url:
-            st.error("Veuillez entrer une URL YouTube valide")
+            st.error("URL YouTube invalide")
         else:
             # Get playlist info first
             with st.spinner("Récupération des informations de la playlist..."):
@@ -303,11 +303,7 @@ if submit:
                 # Start download (pass the already-fetched info to avoid duplicate fetch)
                 st.session_state.downloading = True
                 st.session_state.download_results = {'success': [], 'failed': []}
-                # Clear old file data to prevent memory buildup
-                if 'downloadable_files' in st.session_state:
-                    del st.session_state.downloadable_files
-                if 'current_output_dir' in st.session_state:
-                    del st.session_state.current_output_dir
+                st.session_state.downloaded_files = set()
                 
                 results = download_playlist(playlist_url, str(output_dir), playlist_info=info)
                 st.session_state.download_results = results
@@ -318,7 +314,7 @@ if submit:
 
 # Show current status
 if st.session_state.downloading:
-    st.warning("Téléchargement en cours... Veuillez patienter.")
+    st.warning("Téléchargement en cours...")
 
 # Display results if available (persists after button click)
 if st.session_state.download_results and (st.session_state.download_results.get('success') or st.session_state.download_results.get('failed')):
@@ -349,7 +345,7 @@ if st.session_state.download_results and (st.session_state.download_results.get(
                 use_container_width=True
             )
         with col2:
-            st.info(f"💡 Les fichiers seront enregistrés dans `{output_dir}`.\n\nTéléchargez les {len(results['success'])} pistes en un seul fichier ZIP ou individuellement ci-dessous.")
+            st.info(f"💡 Les fichiers seront enregistrés dans `{output_dir}`.\n\nTélécharge les {len(results['success'])} pistes en un seul fichier ZIP ou individuellement ci-dessous.")
         
         st.markdown("---")
         
