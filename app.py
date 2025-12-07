@@ -45,9 +45,12 @@ def get_cookies_path():
             temp_cookies = tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.txt')
             temp_cookies.write(cookies_content)
             temp_cookies.close()
+            # Debug: confirm cookies loaded
+            st.session_state.cookies_loaded = True
             return temp_cookies.name
     except Exception as e:
-        # Silently fail if secrets not configured
+        # Debug: show error if cookies fail to load
+        st.session_state.cookies_error = str(e)
         pass
     return None
 
@@ -120,6 +123,23 @@ if 'download_results' not in st.session_state:
     st.session_state.download_results = {'success': [], 'failed': []}
 if 'downloaded_files' not in st.session_state:
     st.session_state.downloaded_files = set()
+if 'cookies_loaded' not in st.session_state:
+    st.session_state.cookies_loaded = False
+if 'cookies_error' not in st.session_state:
+    st.session_state.cookies_error = None
+
+# Debug: Show cookies status
+if st.session_state.cookies_loaded:
+    st.success("✅ Cookies YouTube chargés depuis les secrets")
+elif st.session_state.cookies_error:
+    st.error(f"❌ Erreur de chargement des cookies : {st.session_state.cookies_error}")
+else:
+    # Try to load cookies to check status
+    test_cookies = get_cookies_path()
+    if test_cookies:
+        os.unlink(test_cookies)  # Clean up test file
+    if not st.session_state.cookies_loaded:
+        st.warning("⚠️ Pas de cookies configurés - certaines playlists peuvent être bloquées (403)")
 
 
 def sanitize_filename(filename):
@@ -166,8 +186,11 @@ def get_playlist_info(url):
         'no_warnings': True,
         'extract_flat': True,  # Don't download, just get info
         # Use Android client profile + explicit UA to reduce 403 issues on YouTube
-        'extractor_args': {'youtube': {'player_client': ['android']}},
+        'extractor_args': {'youtube': {'player_client': ['android', 'web', 'ios']}},
         'http_headers': {'User-Agent': 'Mozilla/5.0'},
+        # Additional options to bypass restrictions
+        'geo_bypass': True,
+        'geo_bypass_country': 'US',
     }
     
     # Add cookies if available
@@ -269,6 +292,8 @@ def download_playlist(url, output_dir, playlist_info=None):
                     'no_check_certificate': True,
                     'retries': 3,  # Retry failed downloads
                     'fragment_retries': 3,  # Retry failed fragments
+                    'geo_bypass': True,
+                    'geo_bypass_country': 'US',
                 }
                 
                 # Set ffmpeg location if found
