@@ -254,7 +254,7 @@ def download_playlist(url, output_dir, playlist_info=None):
                 
                 # Configure yt-dlp options for this track
                 ydl_opts = {
-                    'format': 'bestaudio/best',
+                    'format': 'bestaudio*',  # More flexible: any audio format
                     'postprocessors': [{
                         'key': 'FFmpegExtractAudio',
                         'preferredcodec': 'mp3',
@@ -263,10 +263,12 @@ def download_playlist(url, output_dir, playlist_info=None):
                     'outtmpl': os.path.join(output_dir, f'{sanitized_title}.%(ext)s'),
                     'quiet': True,
                     'no_warnings': True,
-                    'extractor_args': {'youtube': {'player_client': ['android', 'web']}},
+                    'extractor_args': {'youtube': {'player_client': ['android', 'web', 'ios']}},
                     'http_headers': {'User-Agent': 'Mozilla/5.0'},
-                    'ignoreerrors': False,  # Stop on errors for this track
-                    'no_check_certificate': True,  # Skip SSL verification issues
+                    'ignoreerrors': False,
+                    'no_check_certificate': True,
+                    'retries': 3,  # Retry failed downloads
+                    'fragment_retries': 3,  # Retry failed fragments
                 }
                 
                 # Set ffmpeg location if found
