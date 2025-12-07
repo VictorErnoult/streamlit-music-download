@@ -156,7 +156,7 @@ echo Pour arreter l'application, ferme cette fenetre.
 echo.
 
 REM Launch Streamlit
-python -m streamlit run app.py
+python -m streamlit run app.py --server.headless false --browser.gatherUsageStats false
 
 REM If there's an error, keep window open
 if %errorlevel% neq 0 (

@@ -129,7 +129,7 @@ echo "Pour arrêter l'application, ferme cette fenêtre."
 echo ""
 
 # Launch Streamlit
-python3 -m streamlit run app.py --server.headless true
+python3 -m streamlit run app.py --server.headless false --browser.gatherUsageStats false
 
 # Keep terminal open if there's an error
 if [ $? -ne 0 ]; then
