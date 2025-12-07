@@ -14,8 +14,6 @@ Double-clique sur : launch_windows.bat
 
 ⏱️ Première utilisation : 5-10 minutes
 
-📖 Pour plus d'infos, ouvre : README_UTILISATEUR.md
-
 
 Joyeux Noël ! 🎄
 
