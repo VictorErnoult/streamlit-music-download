@@ -148,6 +148,9 @@ def get_playlist_info(url):
         'quiet': True,
         'no_warnings': True,
         'extract_flat': True,  # Don't download, just get info
+        # Use Android client profile + explicit UA to reduce 403 issues on YouTube
+        'extractor_args': {'youtube': {'player_client': ['android']}},
+        'http_headers': {'User-Agent': 'Mozilla/5.0'},
     }
     
     try:
@@ -176,6 +179,8 @@ def download_playlist(url, output_dir, playlist_info=None):
                 'quiet': True,
                 'no_warnings': True,
                 'extract_flat': True,
+                'extractor_args': {'youtube': {'player_client': ['android']}},
+                'http_headers': {'User-Agent': 'Mozilla/5.0'},
             }
             
             with yt_dlp.YoutubeDL(ydl_info_opts) as ydl:
@@ -229,6 +234,8 @@ def download_playlist(url, output_dir, playlist_info=None):
                     'outtmpl': os.path.join(output_dir, f'{sanitized_title}.%(ext)s'),
                     'quiet': True,
                     'no_warnings': True,
+                    'extractor_args': {'youtube': {'player_client': ['android']}},
+                    'http_headers': {'User-Agent': 'Mozilla/5.0'},
                 }
                 
                 # Set ffmpeg location if found
