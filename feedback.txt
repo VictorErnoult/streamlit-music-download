@@ -1,0 +1,9 @@
+Feedback
+
+- pressing enter in the url input field does not trigger anything
+- the individual download buttons's colors do not change to green when download has been launched
+- the url input field is outlined in red when focused. it should be blue instead
+
+Questions
+
+- why do we need to download the playlist twice? once in the tool, then once locally, can't this be done just once somehow?
