@@ -5,6 +5,7 @@ import re
 import shutil
 import zipfile
 import io
+import tempfile
 from pathlib import Path
 
 # Page configuration
@@ -32,6 +33,22 @@ def get_ffmpeg_path():
     if ffmpeg_path:
         return ffmpeg_path
     
+    return None
+
+
+def get_cookies_path():
+    """Get cookies file path from Streamlit secrets if available."""
+    try:
+        if 'youtube' in st.secrets and 'cookies' in st.secrets.youtube:
+            # Create a temporary file for cookies
+            cookies_content = st.secrets.youtube.cookies
+            temp_cookies = tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.txt')
+            temp_cookies.write(cookies_content)
+            temp_cookies.close()
+            return temp_cookies.name
+    except Exception as e:
+        # Silently fail if secrets not configured
+        pass
     return None
 
 
@@ -153,6 +170,11 @@ def get_playlist_info(url):
         'http_headers': {'User-Agent': 'Mozilla/5.0'},
     }
     
+    # Add cookies if available
+    cookies_path = get_cookies_path()
+    if cookies_path:
+        ydl_opts['cookiefile'] = cookies_path
+    
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=False)
@@ -160,6 +182,13 @@ def get_playlist_info(url):
     except Exception as e:
         st.error(f"Erreur lors de la récupération des informations de la playlist : {str(e)}")
         return None
+    finally:
+        # Clean up temp cookies file if created
+        if cookies_path and os.path.exists(cookies_path):
+            try:
+                os.unlink(cookies_path)
+            except:
+                pass
 
 
 def download_playlist(url, output_dir, playlist_info=None):
@@ -242,6 +271,11 @@ def download_playlist(url, output_dir, playlist_info=None):
                 if ffmpeg_path:
                     ydl_opts['ffmpeg_location'] = ffmpeg_path
                 
+                # Add cookies if available
+                cookies_path = get_cookies_path()
+                if cookies_path:
+                    ydl_opts['cookiefile'] = cookies_path
+                
                 try:
                     # Download the track
                     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -266,6 +300,13 @@ def download_playlist(url, output_dir, playlist_info=None):
                 except Exception as e:
                     results['failed'].append(f"{track_title} (erreur : {str(e)})")
                     continue
+                finally:
+                    # Clean up temp cookies file if created
+                    if cookies_path and os.path.exists(cookies_path):
+                        try:
+                            os.unlink(cookies_path)
+                        except:
+                            pass
             
     except Exception as e:
         st.error(f"Erreur lors du téléchargement : {str(e)}")
