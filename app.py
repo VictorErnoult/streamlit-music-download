@@ -263,8 +263,10 @@ def download_playlist(url, output_dir, playlist_info=None):
                     'outtmpl': os.path.join(output_dir, f'{sanitized_title}.%(ext)s'),
                     'quiet': True,
                     'no_warnings': True,
-                    'extractor_args': {'youtube': {'player_client': ['android']}},
+                    'extractor_args': {'youtube': {'player_client': ['android', 'web']}},
                     'http_headers': {'User-Agent': 'Mozilla/5.0'},
+                    'ignoreerrors': False,  # Stop on errors for this track
+                    'no_check_certificate': True,  # Skip SSL verification issues
                 }
                 
                 # Set ffmpeg location if found
