@@ -277,7 +277,9 @@ def download_playlist(url, output_dir, playlist_info=None):
                 
                 # Configure yt-dlp options for this track
                 ydl_opts = {
-                    'format': 'bestaudio*',  # More flexible: any audio format
+                    # Most flexible format selection - will accept ANY available format
+                    'format': 'bestaudio/best',
+                    'format_sort': ['acodec:opus', 'acodec:m4a', 'acodec:mp3'],  # Prefer common codecs
                     'postprocessors': [{
                         'key': 'FFmpegExtractAudio',
                         'preferredcodec': 'mp3',
@@ -290,10 +292,12 @@ def download_playlist(url, output_dir, playlist_info=None):
                     'http_headers': {'User-Agent': 'Mozilla/5.0'},
                     'ignoreerrors': False,
                     'no_check_certificate': True,
-                    'retries': 3,  # Retry failed downloads
-                    'fragment_retries': 3,  # Retry failed fragments
+                    'retries': 3,
+                    'fragment_retries': 3,
                     'geo_bypass': True,
                     'geo_bypass_country': 'US',
+                    'allow_unplayable_formats': False,  # Skip unplayable formats
+                    'prefer_free_formats': True,  # Prefer formats that don't require decryption
                 }
                 
                 # Set ffmpeg location if found
