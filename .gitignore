@@ -24,7 +24,14 @@ wheels/
 *.egg
 
 # Streamlit
-.streamlit/
+.streamlit/secrets.toml
+
+# Downloads folder (MP3 files)
+downloads/
+
+# OS
+.DS_Store
+Thumbs.db
 
 # IDE
 .vscode/
@@ -33,9 +40,5 @@ wheels/
 *.swo
 *~
 
-# OS
-.DS_Store
-Thumbs.db
-
-# Downloads folder
-downloads/
+# Logs
+*.log
